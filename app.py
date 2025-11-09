@@ -33,7 +33,7 @@ def login_form():
             if username == "user" and password == "pass":
                 st.session_state.logged_in = True
                 st.success("Đăng nhập thành công!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Sai tên đăng nhập hoặc mật khẩu.")
 
@@ -44,7 +44,7 @@ def logout_button():
             st.session_state.logged_in = False
             st.session_state.itinerary_history = []
             st.info("Đã đăng xuất.")
-            st.experimental_rerun()
+            st.rerun()
 
 # ==========================================================
 # 2. Logic TẠO LỊCH TRÌNH
