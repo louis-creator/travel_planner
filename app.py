@@ -115,19 +115,24 @@ def main_app():
             # Xây dựng Prompt cho LLM
             interests_str = ", ".join(interests)
             prompt_template = f"""
-            Bạn là một chuyên gia du lịch. Hãy tạo một lịch trình chi tiết {num_days} ngày cho chuyến đi từ {origin_city} đến {destination_city}.
-            - **Thời gian:** Từ {start_date} đến {end_date}.
+           Bạn là một chuyên gia lập kế hoạch du lịch cực kỳ chính xác. Hãy tạo một lịch trình {num_days} ngày.
+            - **Địa điểm:** {destination_city}.
+            - **Xuất phát:** {origin_city}.
+            - **Số ngày:** {num_days} (Từ {start_date} đến {end_date}).
             - **Sở thích:** {interests_str}.
-            - **Tốc độ:** {pace} (thư giãn nghĩa là ít hoạt động hơn, chặt chẽ nghĩa là nhiều hoạt động hơn).
+            - **Tốc độ:** {pace}.
 
-            **Định dạng đầu ra phải là:**
+            **QUY TẮC ĐẦU RA BẮT BUỘC:**
+            1. **Tuyệt đối không sử dụng văn bản giữ chỗ** như "(Giải thích ngắn gọn)", "Lặp lại cho tất cả...", hoặc bất kỳ lời giới thiệu nào.
+            2. **Đảm bảo tính logic địa lý:** Tất cả hoạt động phải khả thi và liên quan đến {destination_city}.
+            3. **Sử dụng định dạng Markdown nghiêm ngặt** như sau cho mỗi ngày:
 
-            Ngày X: [Tên Ngày]
-            Sáng: [Hoạt động Sáng] (Giải thích ngắn gọn)
-            Chiều: [Hoạt động Chiều] (Giải thích ngắn gọn)
-            Tối: [Hoạt động Tối] (Giải thích ngắn gọn)
+            ### Ngày X: [Tên Ngày]
+            * **Sáng:** [Hoạt động] - [Giải thích ngắn, 1 câu].
+            * **Chiều:** [Hoạt động] - [Giải thích ngắn, 1 câu].
+            * **Tối:** [Hoạt động] - [Giải thích ngắn, 1 câu].
 
-            Lặp lại cho tất cả {num_days} ngày. Đảm bảo phản hồi chỉ chứa lịch trình đã định dạng, không có bất kỳ văn bản giới thiệu hoặc kết thúc nào khác.
+            Bắt đầu phản hồi bằng ngày đầu tiên.
             """
             
             # Gọi LLM và hiển thị kết quả
