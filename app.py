@@ -15,7 +15,7 @@ if 'itinerary_history' not in st.session_state:
     st.session_state.itinerary_history = []
 
 # --- Thông tin cấu hình (Cần thay đổi) ---
-OLLAMA_API_URL = "https://fair-rules-drum.loca.lt/api/generate" # Thay thế bằng URL máy chủ Ollama của bạn
+OLLAMA_API_URL = "http://localhost:11434/api/generate" # Thay thế bằng URL máy chủ Ollama của bạn
 LLM_MODEL = "llama2" # Tên mô hình bạn đã cài đặt trên Ollama
 
 # ==========================================================
