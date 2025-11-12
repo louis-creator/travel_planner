@@ -1,53 +1,70 @@
-# travel_planner
 # ✈️ Ứng dụng Lập kế hoạch Du lịch AI (Streamlit + Ollama)
 
-Ứng dụng này cung cấp giao diện người dùng (Frontend) tương tác để người dùng nhập thông tin chuyến đi và sử dụng Mô hình Ngôn ngữ Lớn (LLM) từ Ollama (Backend) để tạo ra lịch trình du lịch chi tiết theo từng ngày.
+Ứng dụng này là một công cụ lập kế hoạch du lịch sử dụng giao diện Streamlit (Frontend) để thu thập sở thích của người dùng và Mô hình Ngôn ngữ Lớn (LLM) từ máy chủ Ollama (Backend) để tạo ra lịch trình chi tiết theo từng ngày.
 
-## 1. Kiến trúc Tổng quan
+## 1. Kiến trúc và Phụ thuộc
 
-* **Frontend (FE):** Streamlit (Giao diện người dùng).
-* **Backend (BE):** Ollama, chạy trên Google Colab/Kaggle để có thể truy cập công khai.
-* **Kết nối:** Giao tiếp qua API HTTP.
+| Thành phần | Công nghệ | Mục đích |
+| :--- | :--- | :--- |
+| **Frontend** | Streamlit | Thu thập đầu vào, hiển thị lịch trình, Đăng nhập/Lịch sử. |
+| **Backend** | Ollama + Llama 2/Mistral | Máy chủ suy luận LLM. |
+| **Kết nối** | API HTTP/HTTPS | Giao tiếp giữa Streamlit và Ollama. |
 
-## 2. Yêu cầu Tiên quyết (Prerequisites)
+### Yêu cầu Cục bộ
+* **Python:** 3.8+
+* **Thư viện:** Cài đặt các gói trong `requirements.txt` (`streamlit`, `requests`, `fpdf2`, v.v.).
+* **Phần cứng:** Khuyến nghị có **GPU NVIDIA (ví dụ: RTX 3050)** để chạy Ollama với tốc độ cao.
 
-* Python 3.8+
-* Git
-* Tài khoản GitHub
-* **Phụ thuộc:** Các gói trong `requirements.txt` (`streamlit`, `requests`).
+## 2. Hướng dẫn Vận hành (Hai Chế độ)
 
-## 3. Hướng dẫn Thiết lập và Chạy Ứng dụng
+### Chế độ A: Phát triển Cục bộ (Sử dụng GPU Laptop)
 
-### 3.1. Chạy Backend (LLM Server - BẮT BUỘC)
+Đây là chế độ nhanh và ổn định nhất để phát triển và gỡ lỗi.
 
-Vì ứng dụng được triển khai trên Cloud (Streamlit Cloud), máy chủ LLM (Ollama) phải chạy trên một địa chỉ công khai.
-
-1.  **Khởi động Colab:** Mở Notebook Colab của dự án này và chạy tất cả các ô lệnh để:
-    * Cài đặt và khởi động Ollama (`!OLLAMA_HOST=0.0.0.0 nohup ollama serve &`).
-    * Tải mô hình (`!ollama pull llama2`).
-    * Tạo URL công khai bằng `localtunnel` (`!lt --port 11434`).
-2.  **Sao chép URL:** Sao chép URL công khai mới nhất (ví dụ: `https://[dãy-ký-tự].loca.lt`).
-3.  **Cập nhật Mã code:** Đảm bảo biến `OLLAMA_API_URL` trong tệp `app.py` trỏ đến URL công khai đang hoạt động này, kèm theo `/api/generate`.
-    
-    ```python
-    OLLAMA_API_URL = "https://[URL_CÔNG_KHAI_CỦA_BẠN]/api/generate"
+1.  **Thiết lập Ollama:** Đảm bảo bạn đã cài đặt Ollama và CUDA, sau đó chạy máy chủ Ollama và kéo mô hình:
+    ```bash
+    ollama serve
+    # Trong Terminal khác:
+    ollama pull llama2
     ```
+2.  **Cập nhật URL Cục bộ:** Đảm bảo `app.py` trỏ đến `localhost`:
+    ```python
+    OLLAMA_API_URL = "http://localhost:11434/api/generate"
+    ```
+3.  **Khởi chạy Streamlit:**
+    ```bash
+    streamlit run app.py
+    ```
+
+---
+
+### Chế độ B: Triển khai Đám mây và Nộp bài (Sử dụng Colab)
+
+Chế độ này đảm bảo ứng dụng đã triển khai công khai hoạt động.
+
+1.  **Chạy Notebook Colab:** Mở Notebook Colab và chạy các lệnh sau trong các ô code riêng biệt để cài đặt, khởi động và phơi bày API một cách ổn định:
+
+    ```bash
+    # (1) Khởi động Ollama ổn định (giải quyết lỗi PATH và 403 Forbidden)
+    !curl -fsSL [https://ollama.com/install.sh](https://ollama.com/install.sh) | sh
+    import os
+    os.environ['PATH'] += ':/usr/local/bin'
+    !OLLAMA_HOST=0.0.0.0 nohup ollama serve &
     
-    *LƯU Ý: Nếu bạn tắt Notebook Colab, URL sẽ thay đổi và ứng dụng sẽ bị lỗi kết nối.*
+    # (2) Tải mô hình
+    !ollama pull llama2
+    
+    # (3) Lấy URL Công khai MỚI
+    !npm install -g localtunnel
+    !lt --port 11434
+    ```
 
-### 3.2. Chạy Frontend (Streamlit)
+2.  **Cập nhật URL Đám mây:** Sao chép **URL công khai mới** từ Colab (ví dụ: `https://[dãy-ký-tự].loca.lt`) và cập nhật `OLLAMA_API_URL` trong `app.py`.
+3.  **Đẩy và Redeploy:** Commit thay đổi và triển khai lại ứng dụng Streamlit Cloud.
 
-Phiên bản đã triển khai trên Streamlit Cloud có thể được truy cập trực tiếp qua đường link công khai:
+## 3. Thông tin Đăng nhập Thử nghiệm
 
-* **Link Triển khai:** [Dán link triển khai Streamlit Cloud của bạn vào đây]
-
-#### Thông tin Đăng nhập Thử nghiệm
-
-Ứng dụng yêu cầu đăng nhập:
+Ứng dụng yêu cầu đăng nhập mô phỏng:
 
 * **Tên đăng nhập:** `user`
 * **Mật khẩu:** `pass`
-
-## 4. Kiểm tra và Gỡ lỗi
-
-* Nếu ứng dụng báo lỗi `403 Forbidden` hoặc `Connection refused`, hãy kiểm tra xem Notebook Colab có đang chạy và đã tạo lại đường hầm `localtunnel` với cấu hình `OLLAMA_HOST=0.0.0.0` chưa.
